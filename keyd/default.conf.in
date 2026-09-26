@@ -1,0 +1,9 @@
+[ids]
+# Keyboards are included so that mouse-button modifiers combine with
+# keyboard keys (e.g. side button + C = Ctrl+C) through one virtual device.
+*
+m:@MOUSE_ID@
+
+# Side buttons act as normal back/forward. mouse-mode-toggle switches them
+# to modifiers at runtime with `keyd bind`.
+[main]

@@ -1,0 +1,34 @@
+#!/bin/sh
+# Toggle the mouse side buttons between back/forward and two modifier keys.
+# Uses keyd's runtime bindings; requires membership in the keyd group.
+#
+# Override the modifiers with environment variables, e.g.
+#   MOUSE_MODE_BACK=alt MOUSE_MODE_FORWARD=meta mouse-mode-toggle
+
+back="${MOUSE_MODE_BACK:-control}"
+forward="${MOUSE_MODE_FORWARD:-shift}"
+state="${XDG_RUNTIME_DIR:-/tmp}/mouse-mode-mods"
+
+notify() {
+    command -v notify-send >/dev/null || return 0
+    notify-send -a "Mouse" -t 1500 \
+        -h string:x-canonical-private-synchronous:mouse-mode \
+        "Side buttons" "$1"
+}
+
+label() {
+    case "$1" in
+        control) echo Ctrl ;;
+        shift)   echo Shift ;;
+        alt)     echo Alt ;;
+        meta)    echo Super ;;
+        *)       echo "$1" ;;
+    esac
+}
+
+if [ -e "$state" ]; then
+    keyd bind reset && rm -f "$state" && notify "Back / Forward"
+else
+    keyd bind "mouse1 = layer($back)" "mouse2 = layer($forward)" \
+        && touch "$state" && notify "$(label "$back") / $(label "$forward")"
+fi
